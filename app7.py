@@ -37,6 +37,7 @@ if st.sidebar.button("アンケートをリセット"):
     st.session_state.fashion_sensitivity = None
     st.session_state.fashion_purchase_frequency = None
     st.session_state.budget = None
+    st.session_state.show_results = None # ← 右側の結果もリセットするために加えました
     st.sidebar.write("アンケートがリセットされました")
 
 # サイドバーに名前を入力
