@@ -13,42 +13,107 @@ RAKUTEN_API_URL = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/2017
 # アプリのタイトル
 st.title("20代女性のライフスタイル・美容・健康サポートアプリ")
 
-# 1. ライフスタイルに関するアンケート
-st.header("1. ライフスタイル")
-schedule = st.radio("日常のスケジュールはどのようなものですか？", 
-                    ["忙しい（仕事や勉強で時間がない）", "余裕がある（時間に余裕があり、自由時間が多い）"])
+#サイドバーにイメージを表示(UI変更で追加)
+image_path = "amizaplogo.png" # ローカルファイルのパスを指定
+caption_text = "いつも頑張っているあなたへ<br>日常生活の隙間に<br>ちょこっと素敵なサービスをお届け"
+st.sidebar.image(image_path, use_column_width=True)
+st.sidebar.markdown("**いつも頑張っているあなたへ**\n\n**日常生活の隙間に**\n\n**ちょこっと素敵なサービスをお届け**\n\n")
 
-weekend = st.radio("週末の過ごし方は？", 
-                   ["アウトドア派（旅行、スポーツなど）", "インドア派（家でリラックスする、本や映画を楽しむ）"])
+# ※１：以下、アンケートをサイドバーに表示（UI変更で追加）
+# セッションステートを利用してアンケートの解答を保持
+if 'submitted' not in st.session_state:
+    st.session_state.submitted = False
 
-# 2. 美容・健康に対する関心度
-st.header("2. 美容・健康に対する関心度")
-beauty_time = st.radio("美容にどのくらい時間をかけていますか？", 
-                       ["1日30分未満", "1日1時間程度", "1日1時間以上"])
+# サイドバーにリセットボタンを追加
+if st.sidebar.button("アンケートをリセット"):
+    # アンケートの回答をリセット
+    st.session_state.submitted = False
+    st.session_state.schedule = None
+    st.session_state.weekend = None
+    st.session_state.beauty_time = None
+    st.session_state.health_conscious = None
+    st.session_state.stress_level = None
+    st.session_state.stress_relief = None
+    st.session_state.fashion_sensitivity = None
+    st.session_state.fashion_purchase_frequency = None
+    st.session_state.budget = None
+    st.sidebar.write("アンケートがリセットされました")
 
-health_conscious = st.radio("健康に気を使っていますか？", 
-                            ["栄養バランスの取れた食事、運動などを意識している", "あまり気にしていない"])
+# サイドバーに名前を入力
+name = st.sidebar.text_input("お名前を教えてください")
+# ※１：以上、アンケートをサイドバーに表示（UI変更で追加）
 
-# 3. ストレスの感じ方と解消方法
-st.header("3. ストレスの感じ方と解消方法")
-stress_level = st.radio("普段、どのくらいストレスを感じていますか？", 
-                        ["高い（常にストレスを感じている）", "中程度（時々ストレスを感じる）", "低い（あまりストレスを感じない）"])
+# ※２：以下、アンケートをサイドバーに表示＆回答変更後結果表示ボタンを明示的に押す仕様に変更（UI変更で修正）
+# 名前が入力され、まだアンケートが提出されていない場合のみ質問を表示
+if name and not st.session_state.submitted:
+    st.sidebar.write(f"{name}さん、アンケートにお答えください。")
 
-stress_relief = st.radio("ストレス解消方法は？", 
-                         ["ショッピングや美容サービスの利用", "友人と過ごす", "一人で過ごす", "運動やアウトドア活動"])
+    # 1. ライフスタイルに関するアンケート
+    with st.sidebar.expander("1. ライフスタイルに関するアンケート"):
+        schedule = st.radio("日常のスケジュールはどのようなものですか？", 
+                            ["忙しい（仕事や勉強で時間がない）", "余裕がある（時間に余裕があり、自由時間が多い）"],
+                            on_change=lambda: st.session_state.update(show_results=False))
 
-# 4. ファッション・トレンドへの関心度
-st.header("4. ファッション・トレンドへの関心度")
-fashion_sensitivity = st.radio("ファッションやトレンドに敏感ですか？", 
-                               ["非常に敏感", "まあまあ敏感", "あまり気にしない"])
+        weekend = st.radio("週末の過ごし方は？", 
+                        ["アウトドア派（旅行、スポーツなど）", "インドア派（家でリラックスする、本や映画を楽しむ）"],
+                        on_change=lambda: st.session_state.update(show_results=False))
 
-fashion_purchase_frequency = st.radio("どのくらいの頻度でファッションアイテムを購入しますか？", 
-                                      ["毎月", "3か月に一度", "年に数回"])
+    # 2. 美容・健康に対する関心度
+    with st.sidebar.expander("2. 美容・健康に対する関心度"):
+        beauty_time = st.radio("美容にどのくらい時間をかけていますか？", 
+                            ["1日30分未満", "1日1時間程度", "1日1時間以上"],
+                            on_change=lambda: st.session_state.update(show_results=False))
 
-# 5. 予算
-st.header("5. 予算")
-budget = st.radio("美容やリラクゼーションにどれくらいの予算をかけていますか？", 
-                  ["1万円未満", "1万円〜3万円", "3万円以上"])
+        health_conscious = st.radio("健康に気を使っていますか？", 
+                                    ["栄養バランスの取れた食事、運動などを意識している", "あまり気にしていない"],
+                                    on_change=lambda: st.session_state.update(show_results=False))
+
+    # 3. ストレスの感じ方と解消方法
+    with st.sidebar.expander("3. ストレスの感じ方と解消方法"):
+        stress_level = st.radio("普段、どのくらいストレスを感じていますか？", 
+                                ["高い（常にストレスを感じている）", "中程度（時々ストレスを感じる）", "低い（あまりストレスを感じない）"],
+                                on_change=lambda: st.session_state.update(show_results=False))
+
+        stress_relief = st.radio("ストレス解消方法は？", 
+                                ["ショッピングや美容サービスの利用", "友人と過ごす", "一人で過ごす", "運動やアウトドア活動"],
+                                on_change=lambda: st.session_state.update(show_results=False))
+
+    # 4. ファッション・トレンドへの関心度
+    with st.sidebar.expander("4. ファッション・トレンドへの関心度"):
+        fashion_sensitivity = st.radio("ファッションやトレンドに敏感ですか？", 
+                                    ["非常に敏感", "まあまあ敏感", "あまり気にしない"],
+                                    on_change=lambda: st.session_state.update(show_results=False))
+
+        fashion_purchase_frequency = st.radio("どのくらいの頻度でファッションアイテムを購入しますか？", 
+                                            ["毎月", "3か月に一度", "年に数回"],
+                                            on_change=lambda: st.session_state.update(show_results=False))
+
+    # 5. 予算
+    with st.sidebar.expander("5. 予算"):
+        budget = st.radio("美容やリラクゼーションにどれくらいの予算をかけていますか？", 
+                        ["1万円未満", "1万円〜3万円", "3万円以上"],
+                        on_change=lambda: st.session_state.update(show_results=False))
+
+    # アンケート保存ボタン
+    if st.sidebar.button("アンケートを保存"):
+        # セッションに回答を保存
+        st.session_state.submitted = True
+        st.session_state.schedule = schedule
+        st.session_state.weekend = weekend
+        st.session_state.beauty_time = beauty_time
+        st.session_state.health_conscious = health_conscious
+        st.session_state.stress_level = stress_level
+        st.session_state.stress_relief = stress_relief
+        st.session_state.fashion_sensitivity = fashion_sensitivity
+        st.session_state.fashion_purchase_frequency = fashion_purchase_frequency
+        st.session_state.budget = budget
+        st.sidebar.write("アンケートを保存しました")
+else:
+    if st.session_state.submitted:
+        st.sidebar.write("アンケートは既に解答済みです。")
+    else:
+        st.sidebar.write("お名前を入力してください。")
+# ※２：以上、アンケートをサイドバーに表示＆回答変更後結果表示ボタンを明示的に押す仕様に変更（UI変更で修正）
 
 # （新たに追加）セッション状態の初期化
 if "show_results" not in st.session_state:
@@ -59,6 +124,12 @@ if st.button("結果を表示"):
     st.session_state.show_results = True
 
 if st.session_state.show_results:
+    #  セッションから回答を取得（UI変更で追加）
+    if st.session_state.submitted:
+        schedule = st.session_state.get('schedule', None)
+        weekend = st.session_state.get('weekend', None)
+        health_conscious = st.session_state.get('health_conscious', None)
+
     # リクエストパラメータを設定
     params = {
         "applicationId": RAKUTEN_APP_ID,
