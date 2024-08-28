@@ -1,0 +1,8 @@
+streamlit==1.37.1
+requests==2.32.3
+geopy==2.4.1
+pandas==2.2.2
+numpy==1.26.4
+DateTime==5.5
+geographiclib==2.0
+nominatim==0.1
