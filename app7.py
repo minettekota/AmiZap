@@ -7,8 +7,9 @@ import numpy as np
 import datetime
 
 # 楽天APIの設定
-RAKUTEN_APP_ID = "1083501311495962220"
-RAKUTEN_API_URL = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20170706"
+RAKUTEN_APP_ID = st.secrets["rakuten"]["app_id"]
+RAKUTEN_API_URL = st.secrets["rakuten"]["api_url"]
+
 
 # アプリのタイトル
 st.title("20代女性のライフスタイル・美容・健康サポートアプリ")
@@ -160,7 +161,7 @@ if st.session_state.show_results:
             item_url = item["Item"]["itemUrl"]
             item_image = item["Item"]["mediumImageUrls"][0]["imageUrl"]  # 商品画像
             
-            st.image(item_image, caption=item_name, use_column_width=True)
+            st.image(item_image, caption=item_name, use_column_width=False, width=500)
             st.write(f"価格: ¥{item_price}")
             st.write(f"[楽天で見る]({item_url})")
             st.write("---")
